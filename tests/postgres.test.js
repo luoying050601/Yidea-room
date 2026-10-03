@@ -5,6 +5,15 @@ import { PostgresStore } from '../server/postgres-store.js';
 
 const connectionString = process.env.TEST_DATABASE_URL;
 
+test('Postgres store normalizes JSON text and JSONB board values', async () => {
+    const store = Object.create(PostgresStore.prototype);
+    const board = { id: 'welcome', title: 'Welcome', objects: [], comments: [], revision: 0 };
+    store.sql = async () => [{ board: JSON.stringify(board) }];
+    assert.deepEqual(await store.list(), [board]);
+    store.sql = async () => [{ board }];
+    assert.deepEqual(await store.get('welcome'), board);
+});
+
 test('Postgres store persists boards and serializes concurrent updates', { skip: !connectionString }, async () => {
     const store = new PostgresStore(connectionString), id = `test_${randomUUID().replaceAll('-', '')}`;
     try {

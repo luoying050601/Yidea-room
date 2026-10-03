@@ -4,5 +4,8 @@ CREATE TABLE IF NOT EXISTS public.idea_boards (
   updated_at timestamptz NOT NULL DEFAULT now()
 );
 
+ALTER TABLE public.idea_boards
+  ALTER COLUMN board TYPE jsonb USING board::jsonb;
+
 ALTER TABLE public.idea_boards ENABLE ROW LEVEL SECURITY;
 REVOKE ALL ON TABLE public.idea_boards FROM anon, authenticated;
